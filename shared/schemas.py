@@ -55,6 +55,12 @@ class OrganismState(BaseModel):
     cause_of_death: Optional[str] = None
 
 
+class ResourcePatch(BaseModel):
+    x: float
+    y: float
+    amount: float
+
+
 class TelemetryFrame(BaseModel):
     step: int
     time: float
@@ -63,3 +69,4 @@ class TelemetryFrame(BaseModel):
     deaths_this_step: int
     metrics: Dict[str, float]
     organisms: List[OrganismState]
+    resources: Optional[List[ResourcePatch]] = None

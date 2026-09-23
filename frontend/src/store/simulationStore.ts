@@ -29,6 +29,12 @@ export interface MetricFrame {
   avg_vision: number;
 }
 
+export interface ResourcePatchData {
+  x: number;
+  y: number;
+  amount: number;
+}
+
 export interface TelemetryData {
   step: number;
   time: number;
@@ -37,6 +43,7 @@ export interface TelemetryData {
   deaths_this_step: number;
   metrics: Record<string, number>;
   organisms: OrganismData[];
+  resources?: ResourcePatchData[];
 }
 
 interface SimulationStoreState {
@@ -80,34 +87,42 @@ export const useSimulationStore = create<SimulationStoreState>((set, get) => ({
 
   togglePlayback: async () => {
     const currentlyRunning = get().isRunning;
-    const endpoint = currentlyRunning ? '/api/simulation/pause' : '/api/simulation/start';
+    const endpoint = currentlyRunning ? '/api/simulation/pause' : '/api/simulation/resume';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     try {
-      await fetch(`http://localhost:8000${endpoint}`, { method: 'POST' });
-      set({ isRunning: !currentlyRunning });
+      const res = await fetch(`${baseUrl}${endpoint}`, { method: 'POST' });
+      if (res.ok) {
+        set({ isRunning: !currentlyRunning });
+      }
     } catch (e) {
       console.error('Failed to toggle simulation state', e);
-      set({ isRunning: !currentlyRunning });
     }
   },
 
   stepSimulation: async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     try {
-      const res = await fetch('http://localhost:8000/api/simulation/step', { method: 'POST' });
-      const frame: TelemetryData = await res.json();
-      get().processFrame(frame);
+      const res = await fetch(`${baseUrl}/api/simulation/step`, { method: 'POST' });
+      if (res.ok) {
+        const frame: TelemetryData = await res.json();
+        get().processFrame(frame);
+      }
     } catch (e) {
       console.error('Failed to step simulation', e);
     }
   },
 
   resetSimulation: async (seed = 42) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     try {
-      await fetch('http://localhost:8000/api/simulation/start', {
+      const res = await fetch(`${baseUrl}/api/simulation/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ seed }),
       });
-      set({ latestFrame: null, metricHistory: [], selectedOrganismId: null, isRunning: true });
+      if (res.ok) {
+        set({ latestFrame: null, metricHistory: [], selectedOrganismId: null, isRunning: true });
+      }
     } catch (e) {
       console.error('Failed to reset simulation', e);
     }

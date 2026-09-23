@@ -257,6 +257,19 @@ class SimulationEngine:
             metrics_dict[f"gene_{gene}_mean"] = stats["mean"]
             metrics_dict[f"gene_{gene}_std"] = stats["std"]
 
+        # Extract active food resource patches (where food > 5.0)
+        from shared.schemas import ResourcePatch
+        food_indices = np.argwhere(self.world.food_field > 5.0)
+        resource_patches = []
+        for r, c in food_indices[:150]:
+            resource_patches.append(
+                ResourcePatch(
+                    x=float(c * self.world.resolution + self.world.resolution / 2),
+                    y=float(r * self.world.resolution + self.world.resolution / 2),
+                    amount=float(self.world.food_field[r, c]),
+                )
+            )
+
         frame = TelemetryFrame(
             step=self.step_count,
             time=float(self.step_count),
@@ -265,6 +278,7 @@ class SimulationEngine:
             deaths_this_step=self.deaths_this_step,
             metrics=metrics_dict,
             organisms=[o.to_state() for o in alive_remaining[:200]],
+            resources=resource_patches,
         )
 
         # STEP 13: Advance generation/time

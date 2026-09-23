@@ -38,7 +38,8 @@ export default function ArtificialLifeLabApp() {
     let reconnectTimeout: NodeJS.Timeout;
 
     const connect = () => {
-      ws = new WebSocket('ws://localhost:8000/ws/simulation');
+      const wsBase = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+      ws = new WebSocket(`${wsBase}/ws/simulation`);
 
       ws.onmessage = (event) => {
         try {

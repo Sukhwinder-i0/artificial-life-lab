@@ -59,6 +59,20 @@ async def start_simulation(config: Optional[SimulationConfig] = None):
     return {"status": "started", "seed": engine_instance.seed}
 
 
+@app.post("/api/simulation/resume")
+async def resume_simulation():
+    global is_running
+    is_running = True
+    return {"status": "resumed"}
+
+
+@app.post("/api/simulation/pause")
+async def pause_simulation():
+    global is_running
+    is_running = False
+    return {"status": "paused"}
+
+
 @app.post("/api/simulation/step")
 async def step_simulation(steps: int = 1):
     global engine_instance
@@ -72,11 +86,15 @@ async def step_simulation(steps: int = 1):
     return frame.model_dump() if frame else {}
 
 
-@app.post("/api/simulation/pause")
-async def pause_simulation():
-    global is_running
-    is_running = False
-    return {"status": "paused"}
+@app.post("/api/simulation/reset")
+async def reset_simulation(payload: Optional[dict] = None):
+    global engine_instance, is_running
+    p = payload or {}
+    seed = p.get("seed", 42)
+    cfg = SimulationConfig(seed=seed)
+    engine_instance = SimulationEngine(config=cfg)
+    is_running = True
+    return {"status": "reset", "seed": engine_instance.seed}
 
 
 @app.post("/api/reports/generate")
