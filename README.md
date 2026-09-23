@@ -164,7 +164,7 @@ If you use **ARTIFICIAL LIFE LAB** in your research, please cite:
   title={Artificial Life Lab: A Scientifically Transparent Computational Ecosystem Engine for Evolutionary and Social Dynamics},
   author={Artificial Life Lab Research Team},
   year={2026},
-  url={https://github.com/your-org/artificial-life-lab}
+  url={https://github.com/sukhwinder-i0/artificial-life-lab}
 }
 ```
 
