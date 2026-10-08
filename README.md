@@ -108,7 +108,7 @@ artificial-life-lab/
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/artificial-life-lab.git
+git clone https://github.com/Sukhwinder-i0/artificial-life-lab.git
 cd artificial-life-lab
 
 # Create virtual environment and install dependencies
